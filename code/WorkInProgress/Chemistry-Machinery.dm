@@ -67,7 +67,6 @@
 					G.reagents.add_reagent(id,10)
 				if(amount >= R.maximum_volume - 10)
 					G.reagents.add_reagent(id,R.maximum_volume - amount)
-			usr << "[id]"
 			src.updateUsrDialog()
 			return
 		else
