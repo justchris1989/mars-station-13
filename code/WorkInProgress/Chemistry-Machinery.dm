@@ -8,20 +8,8 @@
 	anchored = 1
 	icon = 'chemical.dmi'
 	icon_state = "dispenser"
-	var/energy = 25
-	var/max_energy = 25
+	var/beaker = null
 	var/list/dispensable_reagents = list("water","oxygen","nitrogen","hydrogen","potassium","mercury","sulfur","carbon","chlorine","fluorine","phosphorus","lithium","acid","radium","iron","aluminium","silicon","plasma","sugar","ethanol")
-
-	proc
-		recharge()
-			if(stat & BROKEN) return
-			if(energy != max_energy)
-				energy++
-				use_power(50)
-			spawn(600) recharge()
-
-	New()
-		recharge()
 
 	ex_act(severity)
 		switch(severity)
@@ -48,26 +36,42 @@
 
 		usr.machine = src
 
+		if (href_list["eject"])
+			beaker:loc = src.loc
+			beaker = null
+			src.updateUsrDialog()
+			return
+
 		if (href_list["dispense"])
-			if(!energy)
-				var/dat = "Not enough energy.<BR><A href='?src=\ref[src];ok=1'>OK</A>"
-				usr << browse("<TITLE>Chemical Dispenser</TITLE>Chemical dispenser:<BR>Energy = [energy]/[max_energy]<BR><BR>[dat]", "window=chem_dispenser")
+			if(!beaker)
+				var/beaker_info = ""
+				if(!beaker)
+					beaker_info += "No beaker loaded."
+				else
+					var/datum/reagents/R = beaker:reagents
+					beaker_info += "Beaker loaded <A href='?src=\ref[src];eject=1>Eject</A>Eject</A>, contains:"
+					for(var/datum/reagent/G in R.reagent_list)
+						beaker_info += "[G.name], [G.volume] u"
+				var/dat = "No beaker loaded.<BR><A href='?src=\ref[src];ok=1'>OK</A>"
+				usr << browse("<TITLE>Chemical Dispenser</TITLE>Chemical dispenser:<BR>[beaker_info]<BR><HR><BR>[dat]", "window=chem_dispenser")
 				return
 			var/id = href_list["dispense"]
-			var/obj/item/weapon/reagent_containers/glass/dispenser/G = new/obj/item/weapon/reagent_containers/glass/dispenser(src.loc)
-			switch(text2num(href_list["state"]))
-				if(LIQUID)
-					G.icon_state = "liquid"
-				if(GAS)
-					G.icon_state = "vapour"
-				if(SOLID)
-					G.icon_state = "solid"
-			G.name += " ([lowertext(href_list["name"])])"
-			G.reagents.add_reagent(id,30)
-			energy--
+			var/obj/item/weapon/reagent_containers/glass/beaker/G = beaker
+			var/datum/reagents/R = beaker:reagents
+			var/amount = R.total_volume
+			if(amount == R.maximum_volume)
+				src.updateUsrDialog()
+				return
+			else
+				if(amount <= R.maximum_volume - 10)
+					G.reagents.add_reagent(id,10)
+				if(amount >= R.maximum_volume - 10)
+					G.reagents.add_reagent(id,R.maximum_volume - amount)
+			usr << "[id]"
 			src.updateUsrDialog()
 			return
 		else
+			src.updateUsrDialog()
 			usr << browse(null, "window=chem_dispenser")
 			return
 
@@ -80,18 +84,40 @@
 	attack_paw(mob/user as mob)
 		return src.attack_hand(user)
 
+	attackby(var/obj/item/weapon/reagent_containers/glass/B as obj, var/mob/user as mob)
+		if(!istype(B, /obj/item/weapon/reagent_containers/glass))
+			return
+
+		if(src.beaker)
+			user << "A beaker is already loaded into the machine."
+			return
+
+		src.beaker =  B
+		user.drop_item()
+		B.loc = src
+		user << "You add the beaker to the machine!"
+		src.updateUsrDialog()
+
 	attack_hand(mob/user as mob)
 		if(stat & BROKEN)
 			return
 		user.machine = src
 		var/dat = ""
+		var/beaker_info = ""
+		if(!beaker)
+			beaker_info += "No beaker loaded."
+		else
+			var/datum/reagents/R = beaker:reagents
+			beaker_info += "Beaker loaded <A href='?src=\ref[src];eject=1'>(Eject)</A>, contains:"
+			for(var/datum/reagent/G in R.reagent_list)
+				beaker_info += "<BR>[G.name], [G.volume] u"
 		for(var/re in dispensable_reagents)
 			for(var/da in typesof(/datum/reagent) - /datum/reagent)
 				var/datum/reagent/temp = new da()
 				if(temp.id == re)
 					dat += "<A href='?src=\ref[src];dispense=[temp.id];state=[temp.reagent_state];name=[temp.name]'>[temp.name]</A><BR>"
 					dat += "[temp.description]<BR><BR>"
-		user << browse("<TITLE>Chemical Dispenser</TITLE>Chemical dispenser:<BR>Energy = [energy]/[max_energy]<BR><BR>[dat]", "window=chem_dispenser")
+		user << browse("<TITLE>Chemical Dispenser</TITLE>Chemical dispenser:<BR>[beaker_info]<BR><HR><BR>[dat]", "window=chem_dispenser")
 
 		onclose(user, "chem_dispenser")
 		return
