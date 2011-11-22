@@ -22,6 +22,10 @@
 	openicon = "o2crateopen"
 	closedicon = "o2crate"
 
+/obj/crate/robotics_metal
+	desc = "A crate."
+	name = "crate"
+
 /obj/crate/eva
 	desc = "EVA-Gear to replace lost/stolen equippment"
 	name = "EVA-Gear"
@@ -160,6 +164,14 @@
 	new /obj/item/weapon/rcd_ammo(src)
 	new /obj/item/weapon/rcd_ammo(src)
 	new /obj/item/weapon/rcd(src)
+
+/obj/crate/robotics_metal/New()
+	..()
+	new /obj/item/weapon/sheet/metal(src)
+	new /obj/item/weapon/sheet/metal(src)
+	new /obj/item/weapon/sheet/metal(src)
+	new /obj/item/weapon/sheet/metal(src)
+	new /obj/item/weapon/sheet/metal(src)
 
 /obj/crate/proc/open()
 	playsound(src.loc, 'click.ogg', 15, 1, -3)

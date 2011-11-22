@@ -218,6 +218,7 @@
 #include "code\defines\procs\religion_name.dm"
 #include "code\defines\procs\station_name.dm"
 #include "code\defines\procs\syndicate_name.dm"
+#include "code\FEA\DEBUG_REMOVE_BEFORE_RELEASE.dm"
 #include "code\FEA\FEA_airgroup.dm"
 #include "code\FEA\FEA_fire.dm"
 #include "code\FEA\FEA_gas_mixture.dm"
