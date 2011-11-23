@@ -23,8 +23,21 @@
 
 	var/coolant = 0
 // Actual code
-/obj/machinery/power/nuclear_power/reactor/attackby(var/obj/O as obj, var/mob/user as mob)
+/obj/machinery/power/nuclear_power/plutonium_adder/attackby(var/obj/O as obj, var/mob/user as mob)
 	if(istype(O, /obj/item/weapon/nuclear/leadbox) || istype(O, /obj/item/weapon/nuclear/plutonium))
+		if(istype(O, /obj/item/weapon/nuclear/leadbox))
+			if(O:amount > 0)
+				src.plutonium += O:amount
+				O:amount = 0
+				usr << "\blue You add the plutonium to the storage unit"
+			else
+				O:amount += src.plutonium
+				src.plutonium = 0
+				usr << "\blue You remove the plutonium from the storage unit."
+		else
+			src.plutonium += O:amount
+			del(O)
+			usr << "\red You add the plutonium to the storage unit."
 
 /obj/machinery/power/nuclear_power/reactor/New()
 	// Here we'll hook the other parts up.
