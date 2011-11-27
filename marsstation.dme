@@ -621,7 +621,6 @@
 #include "code\WorkInProgress\computer2\messenger.dm"
 #include "code\WorkInProgress\computer2\peripherals.dm"
 #include "code\WorkInProgress\nuclear_power\objects.dm"
-#include "code\WorkInProgress\nuclear_power\reactor.dm"
 #include "code\WorkInProgress\optics\beam.dm"
 #include "code\WorkInProgress\optics\laser-pointer.dm"
 #include "code\WorkInProgress\optics\mirror.dm"

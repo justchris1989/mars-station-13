@@ -889,6 +889,19 @@
 			del(D)
 			del(src)
 
+/obj/item/weapon/reagent_containers/glass/big_bucket
+	desc = "It's a bucket."
+	name = "big bucket"
+	icon = 'janitor.dmi'
+	icon_state = "bucket"
+	item_state = "bucket"
+	amount_per_transfer_from_this = 10
+	flags = FPRINT | OPENCONTAINER
+	New()
+		var/datum/reagents/R = new/datum/reagents(5000)
+		reagents = R
+		R.my_atom = src
+
 /obj/item/weapon/reagent_containers/glass/dispenser
 	name = "reagent glass"
 	desc = "A reagent glass."
