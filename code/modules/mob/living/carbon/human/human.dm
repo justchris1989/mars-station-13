@@ -112,8 +112,10 @@
 		return
 	return
 
+
+// nerf movement speed here
 /mob/living/carbon/human/movement_delay()
-	var/tally = 0
+	var/tally = 1.5
 
 	if(src.reagents.has_reagent("hyperzine")) return -1
 
